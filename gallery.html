@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recap.exe | Explorer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-pink: #ff85a1; 
+            --pixel-pink: #ff6b8a; 
+            --dark-pink: #ff0055; 
+            --win-silver: #dfdfdf; /* Classic Windows Gray */
+            --win-white: #ffffff;
+            --win-shadow: #808080;
+            --folder-yellow: #ffe680;
+            --folder-shadow: #ccac00;
+        }
+
+        /* --- 8-BIT CURSOR --- */
+        html, body {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff0055' d='M0 0h2v22h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2V4h-2V2h-2V0H0z'/%3E%3Cpath fill='%23ffffff' d='M2 2h2v18h2v-2h2v-2h2v-2h2v-2h2v-2h2V4h-2V2H2z'/%3E%3C/svg%3E"), auto;
+            margin: 0; padding: 0;
+            background-color: var(--bg-pink);
+            background-image: 
+                linear-gradient(45deg, var(--pixel-pink) 25%, transparent 25%), 
+                linear-gradient(-45deg, var(--pixel-pink) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, var(--pixel-pink) 75%), 
+                linear-gradient(-45deg, transparent 75%, var(--pixel-pink) 75%);
+            background-size: 6px 6px;
+            font-family: 'Tahoma', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- DESKTOP AREA --- */
+        .desktop {
+            flex: 1; /* Takes up remaining space above taskbar */
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            grid-auto-rows: min-content;
+            gap: 25px;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* --- FOLDER ICON STYLING --- */
+        .folder-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff0055' d='M8 0h2v2h2v2h2v2h2v2h2v10h-2v2h-2v2h-8v-2H4v-2H2V8h2v10h2v2h2V2h2V0z'/%3E%3Cpath fill='%23ffffff' d='M10 2h2v2h2v2h2v2h2v8h-2v2h-2v2H8v-2H6v-2H4V10h2v8h2V2h2z'/%3E%3C/svg%3E"), pointer !important;
+        }
+
+        .folder-icon {
+            position: relative;
+            width: 60px;
+            height: 45px;
+            background: var(--folder-yellow);
+            border: 3px solid #000;
+            box-shadow: 3px 3px 0 var(--folder-shadow);
+        }
+
+        .folder-icon::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -3px;
+            width: 25px;
+            height: 10px;
+            background: var(--folder-yellow);
+            border: 3px solid #000;
+            border-bottom: none;
+        }
+
+        .folder-label {
+            margin-top: 10px;
+            color: white;
+            padding: 2px 5px;
+            font-size: 10px;
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            text-shadow: 2px 2px #000;
+        }
+
+        .folder-item:hover .folder-label {
+            background: var(--dark-pink);
+            outline: 1px dotted white;
+        }
+
+        /* --- BOTTOM WINDOW BAR (TASKBAR) --- */
+        .taskbar {
+            height: 45px;
+            background: var(--win-silver);
+            border-top: 3px solid var(--win-white);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: inset 0 1px 0 var(--win-white);
+            z-index: 1000;
+        }
+
+        .start-btn {
+            background: var(--win-silver);
+            border: 2px solid;
+            border-color: var(--win-white) var(--win-shadow) var(--win-shadow) var(--win-white);
+            padding: 5px 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+            height: 32px;
+        }
+
+        .start-btn:active {
+            border-color: var(--win-shadow) var(--win-white) var(--win-white) var(--win-shadow);
+        }
+
+        .active-apps {
+            flex: 1;
+            margin-left: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .app-tab {
+            background: var(--win-silver);
+            border: 2px solid;
+            border-color: var(--win-shadow) var(--win-white) var(--win-white) var(--win-shadow);
+            padding: 5px 10px;
+            font-size: 9px;
+            width: 120px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .systray {
+            border: 2px inset var(--win-white);
+            padding: 5px 10px;
+            font-size: 10px;
+            font-family: 'Press Start 2P', cursive;
+            color: #333;
+            background: var(--win-silver);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="desktop" id="folderContainer">
+        </div>
+
+    <div class="taskbar">
+        <button class="start-btn">
+            <span style="color: var(--dark-pink);">❤</span> START
+        </button>
+
+        <div class="active-apps">
+            <div class="app-tab">Recaps Explorer</div>
+        </div>
+
+        <div class="systray" id="clock">
+            12:00 PM
+        </div>
+    </div>
+
+    <script>
+        // Folder Generation Logic
+        const container = document.getElementById('folderContainer');
+        const totalFolders = 20;
+
+        function getOrdinal(n) {
+            let s = ["th", "st", "nd", "rd"], v = n % 100;
+            return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        }
+
+        for (let i = 1; i <= totalFolders; i++) {
+            const label = getOrdinal(i);
+            const folder = document.createElement('a');
+            folder.href = `folder${i}.html`;
+            folder.className = 'folder-item';
+            folder.innerHTML = `<div class="folder-icon"></div><div class="folder-label">${label}</div>`;
+            container.appendChild(folder);
+        }
+
+        // Live Clock Logic
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            document.getElementById('clock').innerHTML = hours + ':' + minutes + ' ' + ampm;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>

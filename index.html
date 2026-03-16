@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recap.exe | Jeff & Crystal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-pink: #ff85a1; 
+            --pixel-pink: #ff6b8a; 
+            --dark-pink: #ff0055; 
+            --silver: #fdf2f4; 
+            --win-pink: #ff4d80; 
+            --white: #ffffff;
+            --border-dark: #cc3366;
+        }
+
+        /* --- 8-BIT CURSOR LOGIC --- */
+        html, body {
+            /* This is a custom 8-bit pink arrow cursor */
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff0055' d='M0 0h2v22h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2V4h-2V2h-2V0H0z'/%3E%3Cpath fill='%23ffffff' d='M2 2h2v18h2v-2h2v-2h2v-2h2v-2h2v-2h2V4h-2V2H2z'/%3E%3C/svg%3E"), auto;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 8-bit hand pointer for clickable elements */
+        button, a, .win-btn, .photo-item {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff0055' d='M8 0h2v2h2v2h2v2h2v2h2v10h-2v2h-2v2h-8v-2H4v-2H2V8h2v10h2v2h2V2h2V0z'/%3E%3Cpath fill='%23ffffff' d='M10 2h2v2h2v2h2v2h2v8h-2v2h-2v2H8v-2H6v-2H4V10h2v8h2V2h2z'/%3E%3C/svg%3E"), pointer !important;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            background-color: var(--bg-pink);
+            background-image: 
+                linear-gradient(45deg, var(--pixel-pink) 25%, transparent 25%), 
+                linear-gradient(-45deg, var(--pixel-pink) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, var(--pixel-pink) 75%), 
+                linear-gradient(-45deg, transparent 75%, var(--pixel-pink) 75%);
+            background-size: 6px 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .landing-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            position: relative;
+            transform: translateY(-20px);
+        }
+
+        /* --- Retro Window Styling --- */
+        .window {
+            background: var(--silver);
+            border: 4px solid;
+            border-color: var(--white) var(--border-dark) var(--border-dark) var(--white);
+            box-shadow: 6px 6px 0 0 rgba(0,0,0,0.2);
+            padding: 5px;
+            width: fit-content;
+            margin-bottom: 25px;
+        }
+
+        .window-header {
+            background: var(--win-pink);
+            color: white;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            font-family: 'Press Start 2P', cursive;
+            margin-bottom: 15px;
+        }
+
+        .win-btn {
+            width: 22px; height: 22px;
+            background: var(--silver);
+            border: 1px solid var(--border-dark);
+            color: var(--dark-pink);
+            font-size: 14px;
+            text-align: center;
+            line-height: 18px;
+            font-weight: bold;
+        }
+
+        .photo-area {
+            display: flex;
+            gap: 25px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 3px inset var(--border-dark);
+        }
+
+        .photo-item img {
+            width: 170px;
+            height: 170px;
+            object-fit: cover;
+            border: 3px solid var(--win-pink);
+            display: block;
+            background: #eee;
+        }
+
+        .photo-label {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 12px;
+            color: var(--dark-pink);
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-family: 'Tahoma', sans-serif;
+        }
+
+        .title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.6rem;
+            color: #fff;
+            text-align: center;
+            margin: 25px 0;
+            text-shadow: 5px 5px var(--dark-pink);
+            line-height: 2;
+        }
+
+        .btn-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-top: 30px;
+        }
+
+        .heart-burst {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 55;
+            top: 10px;
+            left: 40%;
+        }
+
+        .start-btn {
+            background: var(--win-pink);
+            color: white;
+            border: 4px solid;
+            border-color: var(--white) var(--border-dark) var(--border-dark) var(--white);
+            padding: 18px 50px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            box-shadow: 4px 4px 0 0 #000;
+            position: relative;
+            z-index: 60;
+        }
+
+        .btn-wrapper:hover .heart-burst { opacity: 1; }
+        .btn-wrapper:hover .h1 { transform: translate(-140px, -80px) rotate(-20deg); }
+        .btn-wrapper:hover .h2 { transform: translate(110px, -90px) rotate(25deg); }
+        .btn-wrapper:hover .h3 { transform: translate(-120px, 60px) rotate(-10deg); }
+        .btn-wrapper:hover .h4 { transform: translate(100px, 70px) rotate(15deg); }
+
+        .start-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .bg-icon {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.9;
+            filter: drop-shadow(4px 4px 0 var(--dark-pink));
+            z-index: 1;
+            user-select: none;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .bg-icon:nth-child(even) { animation-duration: 8s; animation-delay: 1s; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-icon" style="top: 5%; left: 10%;">🎀</div>
+    <div class="bg-icon" style="bottom: 8%; right: 12%;">🎀</div>
+    <div class="bg-icon" style="top: 15%; right: 25%;">💖</div>
+    <div class="bg-icon" style="bottom: 20%; left: 20%;">💗</div>
+    <div class="bg-icon" style="top: 25%; right: 10%;">✨</div>
+
+    <div class="landing-container">
+        <div class="window">
+            <div class="window-header">
+                <span>RECAP_PREVIEW.EXE</span>
+                <div class="win-btn">×</div>
+            </div>
+            <div class="photo-area">
+                <div class="photo-item">
+                    <img src="photo1.jpg" alt="Memory 1">
+                    <div class="photo-label">LOVE_01.BMP</div>
+                </div>
+                <div class="photo-item">
+                    <img src="photo2.jpg" alt="Memory 2">
+                    <div class="photo-label">LOVE_02.BMP</div>
+                </div>
+            </div>
+        </div>
+
+        <h1 class="title">JEFF & CRYSTAL'S<br>MEMORIES v1.0</h1>
+
+        <div class="btn-wrapper">
+            <span class="heart-burst h1">💖</span>
+            <span class="heart-burst h2">🎀</span>
+            <span class="heart-burst h3">💗</span>
+            <span class="heart-burst h4">✨</span>
+            <button class="start-btn" onclick="openJourney()">[ START.EXE ]</button>
+        </div>
+    </div>
+
+    <script>
+        function openJourney() {
+            const container = document.querySelector('.landing-container');
+            container.style.transition = 'all 0.5s steps(3)';
+            container.style.opacity = '0';
+            container.style.filter = 'brightness(5) hue-rotate(90deg)';
+            
+            setTimeout(() => {
+                window.location.href = "gallery.html";
+            }, 600);
+        }
+    </script>
+</body>
+</html>

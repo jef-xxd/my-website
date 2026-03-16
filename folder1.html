@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1st.exe | Jeff & Crystal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-pink: #ff85a1;
+            --pixel-pink: #ff6b8a;
+            --dark-pink: #ff0055;
+            --win-silver: #dfdfdf;
+            --win-blue: #000080;
+            --whiteboard: #ffffff;
+            --streak-orange: #ff4500;
+            --bios-pink: #ff0077;
+            --bios-bg: #2b0011;
+        }
+
+        /* --- BASE STYLES --- */
+        html, body {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff0055' d='M0 0h2v22h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2V4h-2V2h-2V0H0z'/%3E%3Cpath fill='%23ffffff' d='M2 2h2v18h2v-2h2v-2h2v-2h2v-2h2v-2h2V4h-2V2H2z'/%3E%3C/svg%3E"), auto;
+            margin: 0; padding: 0;
+            background-color: var(--bg-pink);
+            background-image: linear-gradient(45deg, var(--pixel-pink) 25%, transparent 25%), 
+                              linear-gradient(-45deg, var(--pixel-pink) 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, var(--pixel-pink) 75%), 
+                              linear-gradient(-45deg, transparent 75%, var(--pixel-pink) 75%);
+            background-size: 6px 6px;
+            font-family: 'Tahoma', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- THE APP WINDOW --- */
+        .app-window {
+            width: 92%;
+            height: 88vh;
+            background: var(--win-silver);
+            border: 4px solid;
+            border-color: #fff #808080 #808080 #fff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 15px 15px 0 rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, var(--win-blue), #1084d0);
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+        }
+
+        .close-btn {
+            width: 22px; height: 22px;
+            background: var(--win-silver);
+            border: 2px solid;
+            border-color: #fff #000 #000 #fff;
+            color: black;
+            text-align: center;
+            line-height: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* --- PINK BIOS LOADING SCREEN --- */
+        #bios-screen {
+            position: absolute;
+            top: 32px;
+            left: 4px; right: 4px; bottom: 4px;
+            background: var(--bios-bg);
+            color: var(--bios-pink);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            padding: 30px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow: hidden;
+            border: 2px inset #550022;
+        }
+
+        .bios-line { opacity: 0; transform: translateX(-10px); transition: all 0.1s ease; }
+        .bios-line.visible { opacity: 1; transform: translateX(0); }
+
+        /* --- CONTENT AREA --- */
+        .whiteboard {
+            flex: 1;
+            margin: 12px;
+            background: var(--whiteboard);
+            background-image: radial-gradient(#e5e5e5 1px, transparent 1px);
+            background-size: 20px 20px;
+            border: 3px inset #808080;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            display: none;
+        }
+
+        section {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: start;
+            padding: 60px 20px;
+            box-sizing: border-box;
+        }
+
+        /* --- UI COMPONENTS --- */
+        .sticker-wrapper { position: relative; display: inline-block; max-width: 85%; margin-bottom: 20px; }
+        .sticker { position: absolute; font-size: 28px; z-index: 10; animation: stickerFloat 3s ease-in-out infinite; }
+        .s-tr { top: -20px; right: -20px; }
+        .s-tl { top: -20px; left: -20px; }
+        .s-br { bottom: -20px; right: -20px; }
+        
+        @keyframes stickerFloat { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+
+        .streak-container {
+            background: #000; padding: 20px 40px; border-radius: 10px; border: 4px solid var(--streak-orange);
+            display: flex; align-items: center; gap: 15px; box-shadow: 0 0 15px rgba(255, 69, 0, 0.4); margin-bottom: 20px;
+        }
+        .streak-text { color: white; font-family: 'Press Start 2P', cursive; font-size: 14px; text-align: center; }
+
+        .chat-bubble {
+            background: #fff; padding: 30px; border-radius: 30px; border: 3px solid var(--pixel-pink);
+            font-size: 18px; box-shadow: 8px 8px 0 var(--pixel-pink); position: relative;
+        }
+
+        /* --- TYPEWRITER SPECIFIC --- */
+        .typewriter-text {
+            min-height: 100px;
+            display: inline-block;
+        }
+        .cursor-heart {
+            color: var(--dark-pink);
+            animation: pulse 0.8s infinite;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0; } }
+
+        .photo-container { display: flex; flex-direction: column; align-items: center; margin-top: 15px; }
+        .photo-frame { border: 10px solid white; box-shadow: 10px 10px 20px rgba(0,0,0,0.1); max-width: 320px; transition: 0.3s; }
+        .photo-frame:hover { transform: rotate(2deg) scale(1.05); }
+        .photo-metadata {
+            margin-top: 12px; font-family: 'Press Start 2P', cursive; font-size: 8px; color: #555;
+            background: #eee; padding: 6px 12px; border: 2px inset #fff;
+        }
+
+        .letter-box {
+            font-family: 'Georgia', serif; background: #fffef5; padding: 40px; border: 1px solid #ddd;
+            max-width: 650px; text-align: left; line-height: 1.8; font-size: 17px; white-space: pre-line;
+        }
+
+        h2 { font-family: 'Press Start 2P', cursive; font-size: 14px; color: var(--dark-pink); margin: 20px 0; }
+        .top-btn { position: fixed; bottom: 30px; right: 30px; font-size: 35px; background: none; border: none; cursor: pointer; z-index: 100; }
+        
+        .whiteboard::-webkit-scrollbar { width: 10px; }
+        .whiteboard::-webkit-scrollbar-thumb { background: var(--pixel-pink); border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-window">
+        <div class="title-bar">
+            <span>1st.exe - Memory Viewer</span>
+            <a href="gallery.html" class="close-btn">×</a>
+        </div>
+
+        <div id="bios-screen">
+            <div class="bios-line" id="b1">JEFF-OS v1.0 PRE-RELEASE</div>
+            <div class="bios-line" id="b2">CORE: LOVE-ENGINE_2026</div>
+            <div class="bios-line" id="b3">--------------------------</div>
+            <div class="bios-line" id="b4">RAM CHECK: 520MB (OK)</div>
+            <div class="bios-line" id="b5">DRIVE: CRYSTAL_MEMORIES... FOUND</div>
+            <div class="bios-line" id="b6">> BOOTING FROM HEART_SECTOR_0...</div>
+            <div class="bios-line" id="b7">> LOADING SWEET_MESSAGES.DLL</div>
+            <div class="bios-line" id="b8">> STARTING 1st.exe <span class="cursor-heart">❤</span></div>
+        </div>
+
+        <div class="whiteboard" id="scrollArea">
+            <section>
+                <div class="streak-container">
+                    <span class="fire-icon" style="font-size:30px;">🔥</span>
+                    <div class="streak-text">32 CURRENT DAY STREAK ON TIKTOK</div>
+                    <span class="fire-icon" style="font-size:30px;">🔥</span>
+                </div>
+                <h2>Song of the Month</h2>
+                <iframe style="border-radius:12px; max-width:450px;" src="https://open.spotify.com/embed/track/6iwojThk8NJYqaN9LUZSON?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; encrypted-media; fullscreen;" loading="lazy"></iframe>
+            </section>
+
+            <section>
+                <h2>Chat Moment of the Month</h2>
+                <div class="sticker-wrapper">
+                    <span class="sticker s-tr">✨</span>
+                    <div class="chat-bubble">"Looking back at this makes me so happy..."</div>
+                </div>
+                <div class="photo-container">
+                    <img src="photo3.jpg" alt="Chat Memory" class="photo-frame">
+                    <div class="photo-metadata">NAME: cats.jpg | SIZE: 420 KB</div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Funny Chat of the Month</h2>
+                <div class="sticker-wrapper">
+                    <span class="sticker s-tl">😂</span>
+                    <span class="sticker s-br">💀</span>
+                    <div class="chat-bubble" style="border-color: #00bfff; box-shadow: 8px 8px 0 #00bfff;">
+                        "Hindi naman talaga ako napipikon"
+                    </div>
+                </div>
+            </section>
+
+            <section id="typewriter-section">
+                <h2>Sweetest Message</h2>
+                <div class="sticker-wrapper">
+                    <span class="sticker s-tl">💖</span>
+                    <span class="sticker s-tr">🎀</span>
+                    <div class="chat-bubble" style="border-color: #ffd700; box-shadow: 8px 8px 0 #ffd700; font-size: 14px;">
+                        <span id="type-target" class="typewriter-text"></span><span class="cursor-heart">❤</span>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Random Photo You Sent Me</h2>
+                <div class="photo-container">
+                    <img src="photo4.jpg" alt="Memory" class="photo-frame">
+                    <div class="photo-metadata">NAME: cats.jpg | SIZE: 1.2 MB</div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Jeff's Letter for You</h2>
+                <div class="letter-box">
+                    Dear Crystal,
+                    Happy monthsaryyyy my babyyy, this is our ever 1st monthsaryyy grabe ambiliss langgg ng panahon noh, dati pangarap lang kita ngayon kasama na kita thank you for always being theree for me diko inexpect we've come this far and still counting, nagmamahalan pa din despite sa mga tampuhan at awayan natin, we still chose to fix instead na lumala, thankyou for alwaysss alwaysssss understanding meee nung asa downsss thankyou dahil sinusuportahan moko sa mga gustooo ko and thankyouu dahilll dumating ka sa buhay ko, i hope you know how much i lovee you with all my heart and i promise that no matter what hinding hindi ako magsasawang intindihin ka kase ikaw sumuporta sakin in my zero days and you deserved to be loved by me and no matter what i'll be your kakampi sa lahat i'll always be yur loverboiii sa buhay mo malayo man tayo for now but God will find ways para ipaglapit tayo sa isat isaaaa and mahalll na mahallll kitaa sobraa pa sa sobrraaaaa 1month pa langgg pero i hope you know how deeply ako nahuhulog satin, grabe babyyy noh 1 isipin mo 1 month palang dami ng nangyareeee satinnnn marami pa ako gustong sabihin and marami pa akong pangarap na gustong tuparin na kasama ka, sana hindi tayo mauwi sa toxican and im afraid to lose eyou thatss alll babyyy I lovee youuu soo much my everything, my universsee!!! 
+
+                    Again, happyyy 1st monthsaryyyy my loveeee!!!
+                </div>
+            </section>
+
+            <section>
+                <h2>Crystal's Letter for You</h2>
+                <div class="letter-box" style="border-left: 5px solid var(--dark-pink);">
+                    Dear Jeff,
+                    Hi my baby, today is our special day. Happy 1st monthsary, babyy. God knows how grateful I am to have someone like you... Mahal na mahal kita baby. Ikaw at ikaw.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <button class="top-btn" onclick="scrollToTop()">💖</button>
+
+    <script>
+        const sweetMessage = "Hilli babyyyyyy! i just want to say happy valentine, and say thank you for coming to my life and thank you for all the support you give me, i hope you know how much i appreciate you a lot, you made me feel special and luckiest person, I didn't expect to meet you, but I'm so happy because I talked to you and met you. So grateful to love you and be loved by you, baby. you're the best. I know we don't have a label yet, but I just want you to know that I like you too. hindi naman ako ganto sa nakakausap ko dati, pero, iba yung sayo. ang saya saya ko tuwing may sweet messages ka sa'kin. lalo na pagpinaparamdam mong gusto mo talaga akong kausap. maging ganyan ka na lang palagi, please. I hope all of this and the things you're showing me now aren't a trip, and I hope all the good things you're showing me now ay hanggang sa maging tayo na, and please, i told you naman diba na wag mo kong sasanayin kung iiwan mo rin ako, pero, i know na hindi, mahalin mo lang ako please, mas mamahalin kita, hinding hindi kita iiwan o sasaktan. mahilig pa naman ako sa mga sweet messages, wah! i love sweet messages and send to people i love. maikli pa lang to sa ngayon, pero soon mas mahaba na, take care always, okay? mwa mwa mwa, wala na love na love talaga kita, kuhang kuha mo ko. i love you my baby.";
+
+        // PINK BIOS SEQUENCE
+        const biosLines = ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"];
+        let biosDelay = 300;
+        biosLines.forEach((id) => {
+            setTimeout(() => { document.getElementById(id).classList.add('visible'); }, biosDelay);
+            biosDelay += 500; 
+        });
+
+        // REVEAL CONTENT
+        setTimeout(() => {
+            document.getElementById('bios-screen').style.display = 'none';
+            document.getElementById('scrollArea').style.display = 'block';
+            initScrollObserver();
+        }, biosDelay + 1000);
+
+        // TYPEWRITER LOGIC
+        let hasTyped = false;
+        function typeWriter(text, i, targetId) {
+            if (i < text.length) {
+                document.getElementById(targetId).innerHTML += text.charAt(i);
+                setTimeout(() => typeWriter(text, i + 1, targetId), 25);
+            }
+        }
+
+        function initScrollObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasTyped) {
+                        hasTyped = true;
+                        typeWriter(sweetMessage, 0, "type-target");
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            observer.observe(document.getElementById('typewriter-section'));
+        }
+
+        function scrollToTop() {
+            document.getElementById('scrollArea').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
